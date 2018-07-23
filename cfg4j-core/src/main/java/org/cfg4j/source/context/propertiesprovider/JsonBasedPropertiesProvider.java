@@ -59,7 +59,7 @@ public class JsonBasedPropertiesProvider extends FormatBasedPropertiesProvider {
         tokener.back();
         JSONObject obj = new JSONObject(tokener);
 
-        Map<String, Object> yamlAsMap = convertToMap(obj);
+        Map<String, Object> yamlAsMap = convertToMap2(obj);
         properties.putAll(flatten(yamlAsMap));
       }
 
@@ -103,5 +103,26 @@ public class JsonBasedPropertiesProvider extends FormatBasedPropertiesProvider {
     }
     return jsonMap;
 
+  }
+
+  private Map<String, Object> convertToMap2(Object jsonDocument) {
+    Map<String, Object> jsonMap = new LinkedHashMap<>();
+
+    if (jsonDocument instanceof JSONObject) {
+      JSONObject obj = (JSONObject) jsonDocument;
+
+      for (String key : obj.keySet()) {
+        Object value = obj.get(key);
+
+        if (value instanceof JSONObject) {
+          jsonMap.put(key, convertToMap2(value));
+        }
+        else {
+          jsonMap.put(key, value);
+        }
+      }
+    }
+
+    return jsonMap;
   }
 }

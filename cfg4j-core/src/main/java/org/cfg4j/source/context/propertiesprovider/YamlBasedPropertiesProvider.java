@@ -18,6 +18,7 @@ package org.cfg4j.source.context.propertiesprovider;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.List;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.reader.UnicodeReader;
 import org.yaml.snakeyaml.scanner.ScannerException;
@@ -56,7 +57,7 @@ public class YamlBasedPropertiesProvider extends FormatBasedPropertiesProvider {
       Object object = yaml.load(reader);
 
       if (object != null) {
-        Map<String, Object> yamlAsMap = convertToMap(object);
+        Map<String, Object> yamlAsMap = convertToMap2(object);
         properties.putAll(flatten(yamlAsMap));
       }
 
@@ -98,6 +99,25 @@ public class YamlBasedPropertiesProvider extends FormatBasedPropertiesProvider {
 
       yamlMap.put(entry.getKey().toString(), value);
     }
+    return yamlMap;
+  }
+
+  private Map<String, Object> convertToMap2(Object yamlDocument) {
+
+    Map<String, Object> yamlMap = new LinkedHashMap<>();
+
+    if(yamlDocument instanceof Map) {
+      ((Map<String, Object>) yamlDocument).forEach((key, value) -> {
+
+        if (value instanceof Map) {
+          yamlMap.put(key, convertToMap2(value));
+        }
+        else {
+          yamlMap.put(key, value);
+        }
+      });
+    }
+
     return yamlMap;
   }
 }

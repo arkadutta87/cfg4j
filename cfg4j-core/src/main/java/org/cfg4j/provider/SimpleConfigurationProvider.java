@@ -61,19 +61,25 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
 
   @Override
   public <T> T getProperty(String key, Class<T> type) {
-    String propertyStr = getProperty(key);
+
+    return (T) configurationSource.getConfiguration(environment).get(key);
+
+    /*String propertyStr = getProperty(key);
 
     try {
       TypeParser parser = TypeParser.newBuilder().build();
       return parser.parse(propertyStr, type);
     } catch (TypeParserException | NoSuchRegisteredParserException e) {
       throw new IllegalArgumentException("Unable to cast value \'" + propertyStr + "\' to " + type, e);
-    }
+    }*/
   }
 
   @Override
   public <T> T getProperty(String key, GenericTypeInterface genericType) {
-    String propertyStr = getProperty(key);
+
+    return (T) configurationSource.getConfiguration(environment).get(key);
+
+    /*String propertyStr = getProperty(key);
 
     try {
       TypeParser parser = TypeParser.newBuilder().build();
@@ -82,7 +88,7 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
       return property;
     } catch (TypeParserException | NoSuchRegisteredParserException e) {
       throw new IllegalArgumentException("Unable to cast value \'" + propertyStr + "\' to " + genericType, e);
-    }
+    }*/
   }
 
   private String getProperty(String key) {
