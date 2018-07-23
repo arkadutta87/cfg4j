@@ -34,6 +34,7 @@ abstract class FormatBasedPropertiesProvider implements PropertiesProvider {
       Object value = source.get(key);
 
       if (value instanceof Map) {
+        result.put(key, value);
         Map<String, Object> subMap = flatten((Map<String, Object>) value);
 
         for (String subkey : subMap.keySet()) {
@@ -43,6 +44,7 @@ abstract class FormatBasedPropertiesProvider implements PropertiesProvider {
         StringBuilder joiner = new StringBuilder();
         String separator = "";
 
+        result.put(key, value);
         for (Object element : ((Collection) value)) {
           Map<String, Object> subMap = flatten(Collections.singletonMap(key, element));
           joiner
