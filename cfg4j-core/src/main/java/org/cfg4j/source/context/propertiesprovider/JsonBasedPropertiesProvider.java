@@ -18,6 +18,10 @@ package org.cfg4j.source.context.propertiesprovider;
 
 import static java.util.Objects.requireNonNull;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -59,7 +63,7 @@ public class JsonBasedPropertiesProvider extends FormatBasedPropertiesProvider {
         tokener.back();
         JSONObject obj = new JSONObject(tokener);
 
-        Map<String, Object> yamlAsMap = convertToMap(obj);
+        Map<String, Object> yamlAsMap = convertToMap2(obj);
         properties.putAll(flatten(yamlAsMap));
       }
 
@@ -103,5 +107,30 @@ public class JsonBasedPropertiesProvider extends FormatBasedPropertiesProvider {
     }
     return jsonMap;
 
+  }
+
+  private Map<String, Object> convertToMap2(Object jsonDocument) {
+    Map<String, Object> jsonMap = new LinkedHashMap<>();
+
+    if (jsonDocument instanceof JSONObject) {
+      JSONObject obj = (JSONObject) jsonDocument;
+
+      for (String key : obj.keySet()) {
+        Object value = obj.get(key);
+
+        if (value instanceof JSONObject) {
+          jsonMap.put(key, convertToMap2(value));
+        }
+        else if (value instanceof JSONArray) {
+          ArrayList<Object> array = new Gson().fromJson(value.toString(), new TypeToken<List<Object>>(){}.getType());
+          jsonMap.put(key, array);
+        }
+        else {
+          jsonMap.put(key, value);
+        }
+      }
+    }
+
+    return jsonMap;
   }
 }

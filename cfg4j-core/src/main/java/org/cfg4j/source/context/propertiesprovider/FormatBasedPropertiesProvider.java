@@ -19,6 +19,7 @@ package org.cfg4j.source.context.propertiesprovider;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 abstract class FormatBasedPropertiesProvider implements PropertiesProvider {
@@ -33,18 +34,18 @@ abstract class FormatBasedPropertiesProvider implements PropertiesProvider {
     for (String key : source.keySet()) {
       Object value = source.get(key);
 
+      result.put(key, value);
+
       if (value instanceof Map) {
-        result.put(key, value);
         Map<String, Object> subMap = flatten((Map<String, Object>) value);
 
         for (String subkey : subMap.keySet()) {
           result.put(key + "." + subkey, subMap.get(subkey));
         }
-      } else if (value instanceof Collection) {
+      } else if (value instanceof Collection && !(value instanceof List)) {
         StringBuilder joiner = new StringBuilder();
         String separator = "";
 
-        result.put(key, value);
         for (Object element : ((Collection) value)) {
           Map<String, Object> subMap = flatten(Collections.singletonMap(key, element));
           joiner

@@ -18,7 +18,7 @@
 buildscript {
 
     ext {
-        artifactName = "cfg4j-core"
+        artifactName = "cfg4j-dh-core"
     }
 }
 
@@ -30,6 +30,8 @@ dependencies {
     compile group: "com.github.drapostolos", name: "type-parser", version: "0.6.0"
     // JSON support
     compile group: "org.json", name: "json", version: "20160212"
+    // Gson to convert to/from JSON
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
 }
 
 // ----------- Task configurations -----------

@@ -18,7 +18,7 @@
 buildscript {
 
     ext {
-        artifactName = "cfg4j-git"
+        artifactName = "cfg4j-dh-git"
     }
 }
 

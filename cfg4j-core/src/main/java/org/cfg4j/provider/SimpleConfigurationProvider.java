@@ -20,6 +20,7 @@ import static java.util.Objects.requireNonNull;
 import com.github.drapostolos.typeparser.NoSuchRegisteredParserException;
 import com.github.drapostolos.typeparser.TypeParser;
 import com.github.drapostolos.typeparser.TypeParserException;
+import com.google.gson.Gson;
 import org.cfg4j.source.ConfigurationSource;
 import org.cfg4j.source.context.environment.Environment;
 import org.cfg4j.source.context.environment.MissingEnvironmentException;
@@ -29,6 +30,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import org.json.JSONObject;
 
 /**
  * Basic implementation of {@link ConfigurationProvider}. To construct this provider use {@link ConfigurationProviderBuilder}.
@@ -61,19 +63,28 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
 
   @Override
   public <T> T getProperty(String key, Class<T> type) {
-    String propertyStr = getProperty(key);
+
+    Object obj = configurationSource.getConfiguration(environment).get(key);
+    Gson gson = new Gson();
+    String jsonObj = gson.toJson(obj);
+    return gson.fromJson(jsonObj, type);
+
+    /*String propertyStr = getProperty(key);
 
     try {
       TypeParser parser = TypeParser.newBuilder().build();
       return parser.parse(propertyStr, type);
     } catch (TypeParserException | NoSuchRegisteredParserException e) {
       throw new IllegalArgumentException("Unable to cast value \'" + propertyStr + "\' to " + type, e);
-    }
+    }*/
   }
 
   @Override
   public <T> T getProperty(String key, GenericTypeInterface genericType) {
-    String propertyStr = getProperty(key);
+
+    return (T) configurationSource.getConfiguration(environment).get(key);
+
+    /*String propertyStr = getProperty(key);
 
     try {
       TypeParser parser = TypeParser.newBuilder().build();
@@ -82,7 +93,7 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
       return property;
     } catch (TypeParserException | NoSuchRegisteredParserException e) {
       throw new IllegalArgumentException("Unable to cast value \'" + propertyStr + "\' to " + genericType, e);
-    }
+    }*/
   }
 
   private String getProperty(String key) {
