@@ -28,8 +28,12 @@ import org.cfg4j.validator.BindingValidator;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.json.JSONObject;
 
 /**
@@ -39,6 +43,8 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
 
   private final ConfigurationSource configurationSource;
   private final Environment environment;
+
+  private  Map<String,Class<?>> proxyMap;
 
   /**
    * {@link ConfigurationProvider} backed by provided {@link ConfigurationSource} and using {@code environment}
@@ -50,6 +56,7 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
   SimpleConfigurationProvider(ConfigurationSource configurationSource, Environment environment) {
     this.configurationSource = requireNonNull(configurationSource);
     this.environment = requireNonNull(environment);
+    this.proxyMap = new HashMap<>();
   }
 
   @Override
@@ -82,9 +89,14 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
   @Override
   public <T> T getProperty(String key, GenericTypeInterface genericType) {
 
-    return (T) configurationSource.getConfiguration(environment).get(key);
+//    Object obj = configurationSource.getConfiguration(environment).get(key);
+//    Gson gson = new Gson();
+//    String jsonObj = gson.toJson(obj);
+//    return gson.fromJson(jsonObj, genericType.getType());
 
-    /*String propertyStr = getProperty(key);
+//    return (T) configurationSource.getConfiguration(environment).get(key);
+
+    String propertyStr = getProperty(key);
 
     try {
       TypeParser parser = TypeParser.newBuilder().build();
@@ -93,7 +105,7 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
       return property;
     } catch (TypeParserException | NoSuchRegisteredParserException e) {
       throw new IllegalArgumentException("Unable to cast value \'" + propertyStr + "\' to " + genericType, e);
-    }*/
+    }
   }
 
   private String getProperty(String key) {
@@ -115,6 +127,19 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
   @Override
   public <T> T bind(String prefix, Class<T> type) {
     return bind(this, prefix, type);
+  }
+
+//  public <T> void bindKey(String prefix, Class<T> type) {
+//    bindKey(this, prefix, type);
+//  }
+
+  public <T> T extract(String prefix, Class<T> type ){
+
+    Object obj = configurationSource.getConfiguration(environment).get(prefix);
+    Gson gson = new Gson();
+    String jsonObj = gson.toJson(obj);
+    return gson.fromJson(jsonObj, type);
+
   }
 
   /**
@@ -140,6 +165,17 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
 
     return proxy;
   }
+
+//  <T> void bindKey(ConfigurationProvider configurationProvider, String prefix, Class<T> type) {
+//    @SuppressWarnings("unchecked")
+//    T proxy = (T) Proxy
+//      .newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, new BindInvocationHandler(configurationProvider, prefix));
+//
+//    new BindingValidator().validate(proxy, type);
+//
+//    this.proxyMap.put(prefix, type);
+//
+//  }
 
   @Override
   public String toString() {

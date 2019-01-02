@@ -105,4 +105,14 @@ class MeteredConfigurationProvider implements ConfigurationProvider {
       context.stop();
     }
   }
+
+  public <T> T extract(String prefix, Class<T> type ){
+    Timer.Context context = getPropertyGenericTimer.time();
+
+    try {
+      return delegate.extract(prefix, type);
+    } finally {
+      context.stop();
+    }
+  }
 }

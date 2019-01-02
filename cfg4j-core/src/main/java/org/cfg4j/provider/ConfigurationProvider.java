@@ -95,4 +95,9 @@ public interface ConfigurationProvider {
    * @throws IllegalStateException    when provider is unable to fetch configuration value for the given {@code key}
    */
   <T> T bind(String prefix, Class<T> type);
+
+//  <T> void bindKey(String prefix, Class<T> type);
+
+  <T> T extract(String prefix, Class<T> type );
+
 }

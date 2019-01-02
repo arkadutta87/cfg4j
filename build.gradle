@@ -106,54 +106,54 @@ subprojects {
         archives javadocJar, sourcesJar
     }
 
-    uploadArchives {
-        repositories {
-            mavenDeployer {
-                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-                def ossrhUsername = project.findProperty("ossrhUsername") ?: ""
-                def ossrhPassword = project.findProperty("ossrhPassword") ?: ""
-
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: ossrhUsername, password: ossrhPassword)
-                }
-
-                pom.project {
-                    name 'cfg4j'
-                    packaging 'jar'
-                    description 'Configuration library for Java distributed apps.'
-                    url 'http://cfg4j.org'
-
-                    scm {
-                        url 'git@github.com:cfg4j/cfg4j.git'
-                        connection 'scm:git:git@github.com:cfg4j/cfg4j.git'
-                        developerConnection 'scm:git:git@github.com:cfg4j/cfg4j.git'
-                    }
-
-
-                    licenses {
-                        license {
-                            name 'The Apache License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                            distribution 'repo'
-                        }
-                    }
-
-                    developers {
-                        developer {
-                            id 'norbertpotocki'
-                            name 'Norbert Potocki'
-                            email 'norbert.potocki@nort.pl'
-                        }
-                    }
-                }
-            }
-        }
-    }
+//    uploadArchives {
+//        repositories {
+//            mavenDeployer {
+//                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+//
+//                def ossrhUsername = project.findProperty("ossrhUsername") ?: ""
+//                def ossrhPassword = project.findProperty("ossrhPassword") ?: ""
+//
+//                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+//                    authentication(userName: ossrhUsername, password: ossrhPassword)
+//                }
+//
+//                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+//                    authentication(userName: ossrhUsername, password: ossrhPassword)
+//                }
+//
+//                pom.project {
+//                    name 'cfg4j'
+//                    packaging 'jar'
+//                    description 'Configuration library for Java distributed apps.'
+//                    url 'http://cfg4j.org'
+//
+//                    scm {
+//                        url 'git@github.com:cfg4j/cfg4j.git'
+//                        connection 'scm:git:git@github.com:cfg4j/cfg4j.git'
+//                        developerConnection 'scm:git:git@github.com:cfg4j/cfg4j.git'
+//                    }
+//
+//
+//                    licenses {
+//                        license {
+//                            name 'The Apache License, Version 2.0'
+//                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                            distribution 'repo'
+//                        }
+//                    }
+//
+//                    developers {
+//                        developer {
+//                            id 'norbertpotocki'
+//                            name 'Norbert Potocki'
+//                            email 'norbert.potocki@nort.pl'
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
     signing {
