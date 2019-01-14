@@ -23,6 +23,7 @@ import com.codahale.metrics.Timer;
 import org.cfg4j.source.ConfigurationSource;
 import org.cfg4j.source.context.environment.Environment;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -59,7 +60,7 @@ public class MeteredConfigurationSource implements ConfigurationSource {
   }
 
   @Override
-  public Properties getConfiguration(Environment environment) {
+  public Map<String,Properties> getConfiguration(Environment environment) {
     Timer.Context context = getConfigurationTimer.time();
 
     try {

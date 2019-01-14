@@ -34,7 +34,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -101,8 +103,8 @@ public class FilesConfigurationSource implements ConfigurationSource {
    * @throws IllegalStateException       when unable to fetch configuration
    */
   @Override
-  public Properties getConfiguration(Environment environment) {
-    Properties properties = new Properties();
+  public Map<String, Properties> getConfiguration(Environment environment) {
+    Map<String, Properties> propertiesMap = new HashMap<>();
 
     Path rootPath;
     if (environment.getName().trim().isEmpty()) {
@@ -124,14 +126,14 @@ public class FilesConfigurationSource implements ConfigurationSource {
       try (InputStream input = new FileInputStream(path.toFile())) {
 
         PropertiesProvider provider = propertiesProviderSelector.getProvider(path.getFileName().toString());
-        properties.putAll(provider.getProperties(input));
+        propertiesMap.put(path.getFileName().toString(),provider.getProperties(input));
 
       } catch (IOException e) {
         throw new IllegalStateException("Unable to load properties from file: " + path, e);
       }
     }
 
-    return properties;
+    return propertiesMap;
   }
 
   @Override

@@ -38,7 +38,7 @@ public class EnvironmentVariablesConfigurationSource implements ConfigurationSou
   private boolean initialized = false;
 
   @Override
-  public Properties getConfiguration(Environment environment) {
+  public Map<String,Properties> getConfiguration(Environment environment) {
     if (!initialized) {
       throw new IllegalStateException("Configuration source has to be successfully initialized before you request configuration.");
     }
@@ -46,6 +46,7 @@ public class EnvironmentVariablesConfigurationSource implements ConfigurationSou
     environmentVariables.clear();
     environmentVariables.putAll(System.getenv());
 
+    Map<String,Properties> propertiesMap = new HashMap<>();
     Properties properties = new Properties();
 
     String environmentContext = formatEnvironmentContext(environment);
@@ -55,8 +56,9 @@ public class EnvironmentVariablesConfigurationSource implements ConfigurationSou
         properties.put(convertToPropertiesKey(entry.getKey(), environmentContext), entry.getValue());
       }
     }
+    propertiesMap.put(environmentContext, properties);
 
-    return properties;
+    return propertiesMap;
   }
 
   @Override

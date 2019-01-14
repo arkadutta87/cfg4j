@@ -63,7 +63,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
   }
 
   @Override
-  public Properties getConfiguration(Environment environment) {
+  public Map<String, Properties> getConfiguration(Environment environment) {
     LOG.trace("Requesting configuration for environment: " + environment.getName());
 
     if (!initialized) {
@@ -72,6 +72,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
 
     reload();
 
+    Map<String, Properties> propertiesMap = new HashMap<>();
     Properties properties = new Properties();
     String path = environment.getName();
 
@@ -88,8 +89,9 @@ public class ConsulConfigurationSource implements ConfigurationSource {
         properties.put(entry.getKey().substring(path.length()).replace("/", "."), entry.getValue());
       }
     }
+    propertiesMap.put(path, properties);
 
-    return properties;
+    return propertiesMap;
   }
 
   /**

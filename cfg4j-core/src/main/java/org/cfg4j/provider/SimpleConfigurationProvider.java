@@ -60,7 +60,7 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
   }
 
   @Override
-  public Properties allConfigurationAsProperties() {
+  public Map<String,Properties> allConfigurationAsProperties() {
     try {
       return configurationSource.getConfiguration(environment);
     } catch (IllegalStateException | MissingEnvironmentException e) {
@@ -133,9 +133,24 @@ class SimpleConfigurationProvider implements ConfigurationProvider {
 //    bindKey(this, prefix, type);
 //  }
 
-  public <T> T extract(String prefix, Class<T> type ){
+  public <T> T extract(Class<T> type ){
 
-    Object obj = configurationSource.getConfiguration(environment).get(prefix);
+//    Class<?> configClass = type.getClass();
+    ConfigMeta[] annotationsByType = type.getAnnotationsByType(ConfigMeta.class);
+
+    if(annotationsByType == null || annotationsByType.length == 0){
+      throw new RuntimeException("ConfigMeta Annotation not present : Fatal Error");
+    }
+
+    ConfigMeta configMeta = annotationsByType[0];
+
+    String configKey = configMeta.configKey();
+    String bindedFileName = configMeta.bindedFileName();
+
+    final Map<String, Properties> configuration = configurationSource.getConfiguration(environment);
+    Object obj = configuration.get(bindedFileName).get(configKey);
+
+//    Object obj = configurationSource.getConfiguration(environment).get(prefix);
     Gson gson = new Gson();
     String jsonObj = gson.toJson(obj);
     return gson.fromJson(jsonObj, type);

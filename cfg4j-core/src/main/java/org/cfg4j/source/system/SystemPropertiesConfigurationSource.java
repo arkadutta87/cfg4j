@@ -18,6 +18,8 @@ package org.cfg4j.source.system;
 import org.cfg4j.source.ConfigurationSource;
 import org.cfg4j.source.context.environment.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -25,9 +27,14 @@ import java.util.Properties;
  */
 public class SystemPropertiesConfigurationSource implements ConfigurationSource {
 
+  private final static String SYSTEM = "SYSTEM_CONFIG";
+
   @Override
-  public Properties getConfiguration(Environment environment) {
-    return (Properties) System.getProperties().clone();
+  public Map<String, Properties> getConfiguration(Environment environment) {
+    Properties clone = (Properties)System.getProperties().clone();
+    Map<String, Properties> interimMap = new HashMap<>();
+    interimMap.put(SYSTEM,clone);
+    return interimMap;
   }
 
   @Override

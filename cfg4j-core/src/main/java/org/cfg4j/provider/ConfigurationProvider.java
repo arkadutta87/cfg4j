@@ -41,7 +41,7 @@ public interface ConfigurationProvider {
    * @return full configuration set
    * @throws IllegalStateException when provider is unable to fetch configuration
    */
-  Properties allConfigurationAsProperties();
+  Map<String,Properties> allConfigurationAsProperties();
 
   /**
    * Get a configuration property of a given basic {@code type}. Sample call could look like:
@@ -98,6 +98,6 @@ public interface ConfigurationProvider {
 
 //  <T> void bindKey(String prefix, Class<T> type);
 
-  <T> T extract(String prefix, Class<T> type );
+  <T> T extract(Class<T> type );
 
 }

@@ -30,7 +30,7 @@ import java.util.Properties;
  */
 public class CachedConfigurationSource implements ConfigurationSource {
 
-  private final Map<String, Properties> cachedConfigurationPerEnvironment;
+  private final Map<String, Map<String, Properties>> cachedConfigurationPerEnvironment;
   private final ConfigurationSource underlyingSource;
 
   /**
@@ -54,7 +54,7 @@ public class CachedConfigurationSource implements ConfigurationSource {
    * @throws MissingEnvironmentException when there's no config for the given environment in the cache
    */
   @Override
-  public Properties getConfiguration(Environment environment) {
+  public Map<String, Properties> getConfiguration(Environment environment) {
     if (cachedConfigurationPerEnvironment.containsKey(environment.getName())) {
       return cachedConfigurationPerEnvironment.get(environment.getName());
     } else {
@@ -76,7 +76,7 @@ public class CachedConfigurationSource implements ConfigurationSource {
    * @throws IllegalStateException       when unable to fetch configuration
    */
   public void reload(Environment environment) {
-    Properties configuration = underlyingSource.getConfiguration(environment);
+    Map<String,Properties> configuration = underlyingSource.getConfiguration(environment);
     cachedConfigurationPerEnvironment.put(environment.getName(), configuration);
   }
 }

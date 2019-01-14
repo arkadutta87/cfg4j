@@ -22,6 +22,8 @@ import org.cfg4j.source.context.environment.Environment;
 import org.cfg4j.source.context.environment.MissingEnvironmentException;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -55,11 +57,11 @@ public class MergeConfigurationSource implements ConfigurationSource {
    * @throws IllegalStateException       when unable to fetch configuration from one of the underlying sources
    */
   @Override
-  public Properties getConfiguration(Environment environment) {
-    Properties properties = new Properties();
+  public Map<String,Properties> getConfiguration(Environment environment) {
+    Map<String,Properties> properties = new HashMap<>();
 
     for (ConfigurationSource source : sources) {
-      Properties sourceProperties = source.getConfiguration(environment);
+      Map<String,Properties> sourceProperties = source.getConfiguration(environment);
       properties.putAll(sourceProperties);
     }
 

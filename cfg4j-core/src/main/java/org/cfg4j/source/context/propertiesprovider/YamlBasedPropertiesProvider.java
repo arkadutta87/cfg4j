@@ -58,7 +58,8 @@ public class YamlBasedPropertiesProvider extends FormatBasedPropertiesProvider {
 
       if (object != null) {
         Map<String, Object> yamlAsMap = convertToMap2(object);
-        properties.putAll(flatten(yamlAsMap));
+        properties.putAll(yamlAsMap);
+//        properties.putAll(flatten(yamlAsMap));
       }
 
       return properties;
@@ -72,35 +73,35 @@ public class YamlBasedPropertiesProvider extends FormatBasedPropertiesProvider {
    * Convert given Yaml document to a multi-level map.
    */
   @SuppressWarnings("unchecked")
-  private Map<String, Object> convertToMap(Object yamlDocument) {
-
-    Map<String, Object> yamlMap = new LinkedHashMap<>();
-
-    // Document is a text block
-    if (!(yamlDocument instanceof Map)) {
-      yamlMap.put("content", yamlDocument);
-      return yamlMap;
-    }
-
-    for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) yamlDocument).entrySet()) {
-      Object value = entry.getValue();
-
-      if (value instanceof Map) {
-        value = convertToMap(value);
-      } else if (value instanceof Collection) {
-        ArrayList<Map<String, Object>> collection = new ArrayList<>();
-
-        for (Object element : ((Collection) value)) {
-          collection.add(convertToMap(element));
-        }
-
-        value = collection;
-      }
-
-      yamlMap.put(entry.getKey().toString(), value);
-    }
-    return yamlMap;
-  }
+//  private Map<String, Object> convertToMap(Object yamlDocument) {
+//
+//    Map<String, Object> yamlMap = new LinkedHashMap<>();
+//
+//    // Document is a text block
+//    if (!(yamlDocument instanceof Map)) {
+//      yamlMap.put("content", yamlDocument);
+//      return yamlMap;
+//    }
+//
+//    for (Map.Entry<Object, Object> entry : ((Map<Object, Object>) yamlDocument).entrySet()) {
+//      Object value = entry.getValue();
+//
+//      if (value instanceof Map) {
+//        value = convertToMap(value);
+//      } else if (value instanceof Collection) {
+//        ArrayList<Map<String, Object>> collection = new ArrayList<>();
+//
+//        for (Object element : ((Collection) value)) {
+//          collection.add(convertToMap(element));
+//        }
+//
+//        value = collection;
+//      }
+//
+//      yamlMap.put(entry.getKey().toString(), value);
+//    }
+//    return yamlMap;
+//  }
 
   private Map<String, Object> convertToMap2(Object yamlDocument) {
 
@@ -109,12 +110,13 @@ public class YamlBasedPropertiesProvider extends FormatBasedPropertiesProvider {
     if(yamlDocument instanceof Map) {
       ((Map<String, Object>) yamlDocument).forEach((key, value) -> {
 
-        if (value instanceof Map) {
-          yamlMap.put(key, convertToMap2(value));
-        }
-        else {
-          yamlMap.put(key, value);
-        }
+        yamlMap.put(key, value);
+//        if (value instanceof Map) {
+//          yamlMap.put(key, convertToMap2(value));
+//        }
+//        else {
+//          yamlMap.put(key, value);
+//        }
       });
     }
 

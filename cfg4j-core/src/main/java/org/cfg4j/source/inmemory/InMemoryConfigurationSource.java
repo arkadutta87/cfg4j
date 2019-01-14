@@ -20,6 +20,8 @@ import static java.util.Objects.requireNonNull;
 import org.cfg4j.source.ConfigurationSource;
 import org.cfg4j.source.context.environment.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -27,24 +29,28 @@ import java.util.Properties;
  */
 public class InMemoryConfigurationSource implements ConfigurationSource {
 
-  private final Properties properties;
+  private Map<String, Properties> properties;
 
   /**
    * Create in-memory configuration source with given {@code properties}.
    *
    * @param properties properties to seed source.
    */
-  public InMemoryConfigurationSource(Properties properties) {
+  public InMemoryConfigurationSource(Map<String, Properties> properties) {
     this.properties = requireNonNull(properties);
   }
 
   @Override
-  public Properties getConfiguration(Environment environment) {
-    return (Properties) properties.clone();
+  public Map<String, Properties> getConfiguration(Environment environment) {
+    Map<String, Properties> cloneMap = new HashMap<>();
+    cloneMap.putAll(properties);
+//    return (Map<String, Properties>) properties.clone();
+    return cloneMap;
   }
 
   @Override
   public void init() {
+    properties = new HashMap<>();
     // NOP
   }
 

@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -57,7 +59,7 @@ public class S3ConfigurationSource implements ConfigurationSource {
    * @throws NotFoundException when a file corresponding to the requested environment is not found
    */
   @Override
-  public Properties getConfiguration(Environment environment) {
+  public Map<String,Properties> getConfiguration(Environment environment) {
     LOG.trace("Requesting configuration for environment: " + environment.getName());
 
     if (!initialized) {
@@ -74,6 +76,7 @@ public class S3ConfigurationSource implements ConfigurationSource {
 
     S3Object fileFromS3 = s3wrapper.getFile(environment.getName());
 
+    Map<String,Properties> propertiesMap = new HashMap<>();
     Properties properties = new Properties();
     try (InputStream input = fileFromS3.getObjectContent()) {
       properties.load(input);
@@ -88,7 +91,10 @@ public class S3ConfigurationSource implements ConfigurationSource {
       }
     }
 
-    return properties;
+    //TODO: ARKA : This doesnot work I guess .
+    propertiesMap.put(fileFromS3.getBucketName(),properties);
+
+    return propertiesMap;
   }
 
   /**

@@ -19,6 +19,7 @@ import org.cfg4j.source.context.environment.Environment;
 import org.cfg4j.source.context.environment.MissingEnvironmentException;
 import org.cfg4j.source.inmemory.InMemoryConfigurationSource;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -36,7 +37,7 @@ public interface ConfigurationSource {
    * @throws MissingEnvironmentException when requested environment couldn't be found
    * @throws IllegalStateException       when unable to fetch configuration
    */
-  Properties getConfiguration(Environment environment);
+  Map<String,Properties> getConfiguration(Environment environment);
 
   /**
    * Initialize this source. This method has to be called before any other method of this instance.

@@ -21,6 +21,7 @@ import static java.util.Objects.requireNonNull;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -63,7 +64,7 @@ class MeteredConfigurationProvider implements ConfigurationProvider {
   }
 
   @Override
-  public Properties allConfigurationAsProperties() {
+  public Map<String, Properties> allConfigurationAsProperties() {
     Timer.Context context = allConfigurationAsPropertiesTimer.time();
 
     try {
@@ -106,11 +107,11 @@ class MeteredConfigurationProvider implements ConfigurationProvider {
     }
   }
 
-  public <T> T extract(String prefix, Class<T> type ){
+  public <T> T extract(Class<T> type ){
     Timer.Context context = getPropertyGenericTimer.time();
 
     try {
-      return delegate.extract(prefix, type);
+      return delegate.extract(type);
     } finally {
       context.stop();
     }

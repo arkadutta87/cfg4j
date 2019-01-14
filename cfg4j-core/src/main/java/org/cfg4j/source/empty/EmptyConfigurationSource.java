@@ -18,6 +18,8 @@ package org.cfg4j.source.empty;
 import org.cfg4j.source.ConfigurationSource;
 import org.cfg4j.source.context.environment.Environment;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -25,10 +27,10 @@ import java.util.Properties;
  */
 public class EmptyConfigurationSource implements ConfigurationSource {
 
-  private static final Properties properties = new Properties();
+  private static final Map<String, Properties> properties = new HashMap<>();
 
   @Override
-  public Properties getConfiguration(Environment environment) {
+  public Map<String, Properties> getConfiguration(Environment environment) {
     return properties;
   }
 

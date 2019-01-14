@@ -23,6 +23,7 @@ import org.cfg4j.source.context.environment.Environment;
 import org.cfg4j.source.context.environment.MissingEnvironmentException;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -57,7 +58,7 @@ public class FallbackConfigurationSource implements ConfigurationSource {
    * @throws IllegalStateException       when unable to fetch configuration from any of the underlying sources
    */
   @Override
-  public Properties getConfiguration(Environment environment) {
+  public Map<String,Properties> getConfiguration(Environment environment) {
 
     boolean allMissEnvironment = true;
 

@@ -40,7 +40,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -94,7 +96,7 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
   }
 
   @Override
-  public Properties getConfiguration(Environment environment) {
+  public Map<String, Properties> getConfiguration(Environment environment) {
     if (!initialized) {
       throw new IllegalStateException("Configuration source has to be successfully initialized before you request configuration.");
     }
@@ -107,7 +109,7 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
       throw new MissingEnvironmentException(environment.getName(), e);
     }
 
-    Properties properties = new Properties();
+    Map<String,Properties> properties = new HashMap<>();
 
     List<Path> paths = new ArrayList<>();
     for (Path path : configFilesProvider.getConfigFiles()) {
@@ -118,7 +120,9 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
       try (InputStream input = new FileInputStream(path.toFile())) {
 
         PropertiesProvider provider = propertiesProviderSelector.getProvider(path.getFileName().toString());
-        properties.putAll(provider.getProperties(input));
+//        properties.putAll(provider.getProperties(input));
+        Properties fileSpecificProperties = provider.getProperties(input);
+        properties.put(path.getFileName().toString(), fileSpecificProperties);
 
       } catch (IOException e) {
         throw new IllegalStateException("Unable to load configuration from " + path.toString() + " file", e);
