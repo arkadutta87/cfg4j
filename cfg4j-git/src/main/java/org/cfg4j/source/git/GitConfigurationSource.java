@@ -28,8 +28,10 @@ import org.cfg4j.utils.FileUtils;
 import org.eclipse.jgit.api.CheckoutCommand;
 import org.eclipse.jgit.api.CreateBranchCommand;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,9 +43,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Note: use {@link GitConfigurationSourceBuilder} for building instances of this class.
@@ -53,6 +58,8 @@ import java.util.Properties;
 class GitConfigurationSource implements ConfigurationSource, Closeable {
 
   private static final Logger LOG = LoggerFactory.getLogger(GitConfigurationSource.class);
+
+  private static final String EMPTY = "";
 
   private final BranchResolver branchResolver;
   private final PathResolver pathResolver;
@@ -64,6 +71,9 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
   private Git clonedRepo;
   private Path clonedRepoPath;
   private boolean initialized;
+  private int latestCommitTime;
+
+  private Map<String,Properties> properties ;
 
   /**
    * Note: use {@link GitConfigurationSourceBuilder} for building instances of this class.
@@ -92,6 +102,7 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
     this.tmpPath = requireNonNull(tmpPath);
     this.tmpRepoPrefix = requireNonNull(tmpRepoPrefix);
 
+    this.properties = new HashMap<>();
     initialized = false;
   }
 
@@ -109,8 +120,43 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
       throw new MissingEnvironmentException(environment.getName(), e);
     }
 
-    Map<String,Properties> properties = new HashMap<>();
+    //check whether a new commit has been pushed then only execute the next code
+    try{
+      if(hasCommitHappendAfterLastPull()){
+        this.properties = loadConfig(environment);
+      }
+    }catch (GitAPIException e) {
+      throw new MissingEnvironmentException(environment.getName(), e);
+    }
 
+    return this.properties;
+  }
+
+  private boolean hasCommitHappendAfterLastPull() throws GitAPIException{
+    LogCommand log = clonedRepo.log();
+    log.setMaxCount(10);
+
+    Iterable<RevCommit> revCommits = log.call();
+
+    boolean newCommitHappened = false;
+    if(Objects.nonNull(revCommits)){
+      Iterator<RevCommit> iterator = revCommits.iterator();
+      if(iterator.hasNext()){
+        RevCommit next = iterator.next();
+
+        int commitTime = next.getCommitTime();
+
+        if(commitTime > latestCommitTime){
+          latestCommitTime = commitTime;
+          newCommitHappened = true;
+        }
+      }
+    }
+
+    return newCommitHappened;
+  }
+
+  private Map<String,Properties> loadConfig(Environment environment){
     List<Path> paths = new ArrayList<>();
     for (Path path : configFilesProvider.getConfigFiles()) {
       paths.add(clonedRepoPath.resolve(pathResolver.getPathFor(environment)).resolve(path));
@@ -183,6 +229,7 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
         .setName(branch);
 
     List<Ref> refList = clonedRepo.branchList().call();
+    //This code will be called if the branch doesnot exist
     if (!anyRefMatches(refList, branch)) {
       checkoutCommand = checkoutCommand
           .setCreateBranch(true)

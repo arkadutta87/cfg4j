@@ -56,7 +56,7 @@ public class GitConfigurationSourceBuilder {
     branchResolver = new FirstTokenBranchResolver();
     pathResolver = new AllButFirstTokenPathResolver();
     tmpPath = Paths.get(System.getProperty("java.io.tmpdir"));
-    tmpRepoPrefix = "cfg4j-git-config-repository";
+    tmpRepoPrefix = "cfg4j-dh-git-config-repository";
     configFilesProvider = new DefaultConfigFilesProvider();
     propertiesProviderSelector = new PropertiesProviderSelector(
         new PropertyBasedPropertiesProvider(), new YamlBasedPropertiesProvider(), new JsonBasedPropertiesProvider()
