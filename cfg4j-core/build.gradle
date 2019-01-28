@@ -32,6 +32,9 @@ dependencies {
     compile group: "org.json", name: "json", version: "20160212"
     // Gson to convert to/from JSON
     compile group: 'com.google.code.gson', name: 'gson', version: '2.3.1'
+
+    // https://mvnrepository.com/artifact/org.reflections/reflections
+    compile group: 'org.reflections', name: 'reflections', version: '0.9.11'
 }
 
 // ----------- Task configurations -----------

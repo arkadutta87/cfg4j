@@ -30,11 +30,11 @@ public class SystemPropertiesConfigurationSource implements ConfigurationSource 
   private final static String SYSTEM = "SYSTEM_CONFIG";
 
   @Override
-  public Map<String, Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
     Properties clone = (Properties)System.getProperties().clone();
     Map<String, Properties> interimMap = new HashMap<>();
     interimMap.put(SYSTEM,clone);
-    return interimMap;
+    return new ConfigurationState(interimMap, true);
   }
 
   @Override

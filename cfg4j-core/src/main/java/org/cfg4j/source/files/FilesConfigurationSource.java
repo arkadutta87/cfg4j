@@ -103,7 +103,7 @@ public class FilesConfigurationSource implements ConfigurationSource {
    * @throws IllegalStateException       when unable to fetch configuration
    */
   @Override
-  public Map<String, Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
     Map<String, Properties> propertiesMap = new HashMap<>();
 
     Path rootPath;
@@ -133,7 +133,7 @@ public class FilesConfigurationSource implements ConfigurationSource {
       }
     }
 
-    return propertiesMap;
+    return new ConfigurationState(propertiesMap, true);
   }
 
   @Override

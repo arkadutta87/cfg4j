@@ -30,8 +30,8 @@ public class EmptyConfigurationSource implements ConfigurationSource {
   private static final Map<String, Properties> properties = new HashMap<>();
 
   @Override
-  public Map<String, Properties> getConfiguration(Environment environment) {
-    return properties;
+  public ConfigurationState getConfiguration(Environment environment) {
+    return new ConfigurationState(properties, true);
   }
 
   @Override

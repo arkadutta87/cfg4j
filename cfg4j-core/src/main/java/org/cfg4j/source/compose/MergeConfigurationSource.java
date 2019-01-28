@@ -57,15 +57,15 @@ public class MergeConfigurationSource implements ConfigurationSource {
    * @throws IllegalStateException       when unable to fetch configuration from one of the underlying sources
    */
   @Override
-  public Map<String,Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
     Map<String,Properties> properties = new HashMap<>();
 
     for (ConfigurationSource source : sources) {
-      Map<String,Properties> sourceProperties = source.getConfiguration(environment);
-      properties.putAll(sourceProperties);
+      ConfigurationState sourceProperties = source.getConfiguration(environment);
+      properties.putAll(sourceProperties.getData());
     }
 
-    return properties;
+    return new ConfigurationState(properties, true);
   }
 
   @Override

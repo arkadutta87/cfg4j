@@ -63,50 +63,6 @@ class MeteredConfigurationProvider implements ConfigurationProvider {
     bindTimer = metricRegistry.timer(metricPrefix + "bind");
   }
 
-  @Override
-  public Map<String, Properties> allConfigurationAsProperties() {
-    Timer.Context context = allConfigurationAsPropertiesTimer.time();
-
-    try {
-      return delegate.allConfigurationAsProperties();
-    } finally {
-      context.stop();
-    }
-  }
-
-  @Override
-  public <T> T getProperty(String key, Class<T> type) {
-    Timer.Context context = getPropertyTimer.time();
-
-    try {
-      return delegate.getProperty(key, type);
-    } finally {
-      context.stop();
-    }
-  }
-
-  @Override
-  public <T> T getProperty(String key, GenericTypeInterface genericType) {
-    Timer.Context context = getPropertyGenericTimer.time();
-
-    try {
-      return delegate.getProperty(key, genericType);
-    } finally {
-      context.stop();
-    }
-  }
-
-  @Override
-  public <T> T bind(String prefix, Class<T> type) {
-    Timer.Context context = bindTimer.time();
-
-    try {
-      return delegate.bind(this, prefix, type);
-    } finally {
-      context.stop();
-    }
-  }
-
   public <T> T extract(Class<T> type ){
     Timer.Context context = getPropertyGenericTimer.time();
 

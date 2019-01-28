@@ -59,7 +59,7 @@ public class S3ConfigurationSource implements ConfigurationSource {
    * @throws NotFoundException when a file corresponding to the requested environment is not found
    */
   @Override
-  public Map<String,Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
     LOG.trace("Requesting configuration for environment: " + environment.getName());
 
     if (!initialized) {
@@ -94,7 +94,7 @@ public class S3ConfigurationSource implements ConfigurationSource {
     //TODO: ARKA : This doesnot work I guess .
     propertiesMap.put(fileFromS3.getBucketName(),properties);
 
-    return propertiesMap;
+    return new ConfigurationState(propertiesMap, true);
   }
 
   /**

@@ -104,7 +104,7 @@ public class ClasspathConfigurationSource implements ConfigurationSource {
    * @throws IllegalStateException       when unable to fetch configuration
    */
   @Override
-  public Map<String,Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
     Map<String, Properties> properties = new HashMap<>();
 
     Path pathPrefix = Paths.get(environment.getName());
@@ -134,7 +134,7 @@ public class ClasspathConfigurationSource implements ConfigurationSource {
       }
     }
 
-    return properties;
+    return new ConfigurationState(properties, true);
   }
 
   @Override

@@ -19,6 +19,8 @@ import static java.util.Objects.requireNonNull;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+
+import org.cfg4j.source.ConfigurationDataWrapper;
 import org.cfg4j.source.ConfigurationSource;
 import org.cfg4j.source.context.environment.DefaultEnvironment;
 import org.cfg4j.source.context.environment.Environment;
@@ -47,6 +49,8 @@ public class ConfigurationProviderBuilder {
   private MetricRegistry metricRegistry;
   private String prefix;
 
+  private String basePathToConfigMetaClasses;
+
   /**
    * Construct {@link ConfigurationProvider}s builder.
    * <p>
@@ -63,6 +67,7 @@ public class ConfigurationProviderBuilder {
     reloadStrategy = new ImmediateReloadStrategy();
     environment = new DefaultEnvironment();
     prefix = "";
+    basePathToConfigMetaClasses = "";
   }
 
   /**
@@ -73,6 +78,11 @@ public class ConfigurationProviderBuilder {
    */
   public ConfigurationProviderBuilder withConfigurationSource(ConfigurationSource configurationSource) {
     this.configurationSource = configurationSource;
+    return this;
+  }
+
+  public ConfigurationProviderBuilder withBasePathToConfigMetaClasses(String basePathToConfigMetaClasses){
+    this.basePathToConfigMetaClasses = basePathToConfigMetaClasses;
     return this;
   }
 
@@ -137,10 +147,10 @@ public class ConfigurationProviderBuilder {
         + reloadStrategy.getClass().getCanonicalName() + " reload strategy and "
         + environment.getClass().getCanonicalName() + " environment");
 
-    final CachedConfigurationSource cachedConfigurationSource = new CachedConfigurationSource(configurationSource);
-    if (metricRegistry != null) {
-      configurationSource = new MeteredConfigurationSource(metricRegistry, prefix, cachedConfigurationSource);
-    }
+    final ConfigurationDataWrapper cachedConfigurationSource = new CachedConfigurationSource(configurationSource, basePathToConfigMetaClasses);
+//    if (metricRegistry != null) {
+//      configurationSource = new MeteredConfigurationSource(metricRegistry, prefix, cachedConfigurationSource);
+//    }
     cachedConfigurationSource.init();
 
     Reloadable reloadable = new Reloadable() {

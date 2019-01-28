@@ -37,7 +37,7 @@ public interface ConfigurationSource {
    * @throws MissingEnvironmentException when requested environment couldn't be found
    * @throws IllegalStateException       when unable to fetch configuration
    */
-  Map<String,Properties> getConfiguration(Environment environment);
+  ConfigurationState getConfiguration(Environment environment);
 
   /**
    * Initialize this source. This method has to be called before any other method of this instance.
@@ -46,4 +46,31 @@ public interface ConfigurationSource {
    * @throws SourceCommunicationException when unable to communicate with source
    */
   void init();
+
+  public class ConfigurationState{
+
+    private Map<String,Properties> data;
+    private boolean stateChanged;
+
+    public ConfigurationState(Map<String,Properties> data , boolean stateChanged){
+      this.data = data;
+      this.stateChanged = stateChanged;
+    }
+
+    public void setData(Map<String, Properties> data) {
+      this.data = data;
+    }
+
+    public void setStateChanged(boolean stateChanged) {
+      this.stateChanged = stateChanged;
+    }
+
+    public Map<String, Properties> getData() {
+      return data;
+    }
+
+    public boolean isStateChanged() {
+      return stateChanged;
+    }
+  }
 }

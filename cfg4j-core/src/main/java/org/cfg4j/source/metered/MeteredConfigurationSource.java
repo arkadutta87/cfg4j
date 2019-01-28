@@ -60,7 +60,7 @@ public class MeteredConfigurationSource implements ConfigurationSource {
   }
 
   @Override
-  public Map<String,Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
     Timer.Context context = getConfigurationTimer.time();
 
     try {

@@ -41,11 +41,11 @@ public class InMemoryConfigurationSource implements ConfigurationSource {
   }
 
   @Override
-  public Map<String, Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
     Map<String, Properties> cloneMap = new HashMap<>();
     cloneMap.putAll(properties);
 //    return (Map<String, Properties>) properties.clone();
-    return cloneMap;
+    return new ConfigurationState(cloneMap, true);
   }
 
   @Override

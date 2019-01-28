@@ -27,43 +27,19 @@ import java.util.NoSuchElementException;
  * Invocation handler for proxies created by {@link ConfigurationProvider#bind(String, Class)}. Uses provided
  * {@link ConfigurationProvider} for getting properties.
  */
-class BindInvocationHandler implements InvocationHandler {
+class BindInvocationHandler {
 
   private final ConfigurationProvider simpleConfigurationProvider;
   private final String prefix;
 
   /**
    * Create invocation handler which fetches property from given {@code configurationProvider} using call to
-   * {@link ConfigurationProvider#getProperty(String, Class)} method.
    *
    * @param configurationProvider configuration provider to use for fetching properties
-   * @param prefix                prefix for calls to {@link ConfigurationProvider#getProperty(String, Class)}
    */
   BindInvocationHandler(ConfigurationProvider configurationProvider, String prefix) {
     this.simpleConfigurationProvider = requireNonNull(configurationProvider);
     this.prefix = requireNonNull(prefix);
-  }
-
-  /**
-   * @throws NoSuchElementException    when the provided {@code key} doesn't have a corresponding config value
-   * @throws IllegalArgumentException  when property can't be converted to {@code type}
-   * @throws IllegalStateException     when provider is unable to fetch configuration value for the given {@code key}
-   * @throws InvocationTargetException when invoked an Object-level (e.g. {@link Object#hashCode()}) method and it throws an exception.
-   * @throws IllegalAccessException    when invoked an Object-level (e.g. {@link Object#hashCode()}) method and it is inaccessible.
-   */
-  @Override
-  public Object invoke(Object proxy, Method method, Object[] args) throws InvocationTargetException, IllegalAccessException {
-    if (isObjectMethod(method)) {
-      return method.invoke(this, args);
-    }
-
-    final Type returnType = method.getGenericReturnType();
-    return simpleConfigurationProvider.getProperty(prefix + (prefix.isEmpty() ? "" : ".") + method.getName(), new GenericTypeInterface() {
-      @Override
-      public Type getType() {
-        return returnType;
-      }
-    });
   }
 
   /**

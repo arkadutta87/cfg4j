@@ -58,7 +58,7 @@ public class FallbackConfigurationSource implements ConfigurationSource {
    * @throws IllegalStateException       when unable to fetch configuration from any of the underlying sources
    */
   @Override
-  public Map<String,Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
 
     boolean allMissEnvironment = true;
 

@@ -73,6 +73,7 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
   private boolean initialized;
   private int latestCommitTime;
 
+  private ConfigurationState configurationState;
   private Map<String,Properties> properties ;
 
   /**
@@ -103,11 +104,12 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
     this.tmpRepoPrefix = requireNonNull(tmpRepoPrefix);
 
     this.properties = new HashMap<>();
+    this.configurationState = new ConfigurationState(new HashMap<>(), false);
     initialized = false;
   }
 
   @Override
-  public Map<String, Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
     if (!initialized) {
       throw new IllegalStateException("Configuration source has to be successfully initialized before you request configuration.");
     }
@@ -120,16 +122,19 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
       throw new MissingEnvironmentException(environment.getName(), e);
     }
 
-    //check whether a new commit has been pushed then only execute the next code
+    //check whether a new commit has been pushed then only parse the files
     try{
       if(hasCommitHappendAfterLastPull()){
-        this.properties = loadConfig(environment);
+        Map<String, Properties> propertiesMap  = loadConfig(environment);
+        this.configurationState = new ConfigurationState(propertiesMap, true);
+      }else{
+        this.configurationState.setStateChanged(false);
       }
     }catch (GitAPIException e) {
       throw new MissingEnvironmentException(environment.getName(), e);
     }
 
-    return this.properties;
+    return this.configurationState;
   }
 
   private boolean hasCommitHappendAfterLastPull() throws GitAPIException{
@@ -261,4 +266,6 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
         ", configFilesProvider=" + configFilesProvider +
         '}';
   }
+
+
 }

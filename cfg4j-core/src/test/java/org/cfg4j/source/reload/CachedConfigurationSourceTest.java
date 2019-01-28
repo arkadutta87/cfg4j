@@ -32,7 +32,7 @@ public class CachedConfigurationSourceTest {
 
   @Before
   public void setUp() throws Exception {
-    cachedConfigurationSource = new CachedConfigurationSource(delegateSource);
+    cachedConfigurationSource = new CachedConfigurationSource(delegateSource, "");
   }
 
   @Test
@@ -51,34 +51,6 @@ public class CachedConfigurationSourceTest {
     cachedConfigurationSource.init();
   }
 
-  @Test
-  public void getConfigurationThrowsOnMissingEnvironment() throws Exception {
-    expectedException.expect(MissingEnvironmentException.class);
-    cachedConfigurationSource.getConfiguration(new DefaultEnvironment());
-  }
-
-  @Test
-  public void getConfigurationReturnsReloadResult() throws Exception {
-    Properties properties = new Properties();
-    when(delegateSource.getConfiguration(any(Environment.class))).thenReturn(properties);
-    cachedConfigurationSource.reload(new DefaultEnvironment());
-
-    assertThat(cachedConfigurationSource.getConfiguration(new DefaultEnvironment())).isEqualTo(properties);
-  }
-
-  @Test
-  public void getConfigurationDoesNotChangeValueBetweenReloads() throws Exception {
-    Properties properties = new Properties();
-    when(delegateSource.getConfiguration(any(Environment.class))).thenReturn(properties);
-
-    cachedConfigurationSource.reload(new DefaultEnvironment());
-
-    Properties newProperties = new Properties();
-    newProperties.put("testConfig", "testValue");
-    when(delegateSource.getConfiguration(any(Environment.class))).thenReturn(newProperties);
-
-    assertThat(cachedConfigurationSource.getConfiguration(new DefaultEnvironment())).isEqualTo(properties);
-  }
 
   @Test
   public void reloadPropagatesMissingEnvExceptions() throws Exception {

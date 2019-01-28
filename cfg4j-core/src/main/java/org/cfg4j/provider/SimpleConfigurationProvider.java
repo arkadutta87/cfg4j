@@ -21,6 +21,8 @@ import com.github.drapostolos.typeparser.NoSuchRegisteredParserException;
 import com.github.drapostolos.typeparser.TypeParser;
 import com.github.drapostolos.typeparser.TypeParserException;
 import com.google.gson.Gson;
+
+import org.cfg4j.source.ConfigurationDataWrapper;
 import org.cfg4j.source.ConfigurationSource;
 import org.cfg4j.source.context.environment.Environment;
 import org.cfg4j.source.context.environment.MissingEnvironmentException;
@@ -41,162 +43,31 @@ import org.json.JSONObject;
  */
 class SimpleConfigurationProvider implements ConfigurationProvider {
 
-  private final ConfigurationSource configurationSource;
+  private final ConfigurationDataWrapper configurationDataWrapper;
   private final Environment environment;
 
-  private  Map<String,Class<?>> proxyMap;
-
   /**
-   * {@link ConfigurationProvider} backed by provided {@link ConfigurationSource} and using {@code environment}
-   * to select environment. To construct this provider use {@link ConfigurationProviderBuilder}.
+   * {@link ConfigurationProvider} backed by provided {@link ConfigurationSource} and using {@code environment} to select environment. To
+   * construct this provider use {@link ConfigurationProviderBuilder}.
    *
-   * @param configurationSource source for configuration
-   * @param environment         {@link Environment} to use
+   * @param configurationDataWrapper source for configuration
+   * @param environment {@link Environment} to use
    */
-  SimpleConfigurationProvider(ConfigurationSource configurationSource, Environment environment) {
-    this.configurationSource = requireNonNull(configurationSource);
+  SimpleConfigurationProvider(ConfigurationDataWrapper configurationDataWrapper, Environment environment) {
+    this.configurationDataWrapper = requireNonNull(configurationDataWrapper);
     this.environment = requireNonNull(environment);
-    this.proxyMap = new HashMap<>();
   }
 
-  @Override
-  public Map<String,Properties> allConfigurationAsProperties() {
-    try {
-      return configurationSource.getConfiguration(environment);
-    } catch (IllegalStateException | MissingEnvironmentException e) {
-      throw new IllegalStateException("Couldn't fetch configuration from configuration source", e);
-    }
+  public <T> T extract(Class<T> type) {
+    return configurationDataWrapper.extract(environment, type);
   }
-
-  @Override
-  public <T> T getProperty(String key, Class<T> type) {
-
-    Object obj = configurationSource.getConfiguration(environment).get(key);
-    Gson gson = new Gson();
-    String jsonObj = gson.toJson(obj);
-    return gson.fromJson(jsonObj, type);
-
-    /*String propertyStr = getProperty(key);
-
-    try {
-      TypeParser parser = TypeParser.newBuilder().build();
-      return parser.parse(propertyStr, type);
-    } catch (TypeParserException | NoSuchRegisteredParserException e) {
-      throw new IllegalArgumentException("Unable to cast value \'" + propertyStr + "\' to " + type, e);
-    }*/
-  }
-
-  @Override
-  public <T> T getProperty(String key, GenericTypeInterface genericType) {
-
-//    Object obj = configurationSource.getConfiguration(environment).get(key);
-//    Gson gson = new Gson();
-//    String jsonObj = gson.toJson(obj);
-//    return gson.fromJson(jsonObj, genericType.getType());
-
-//    return (T) configurationSource.getConfiguration(environment).get(key);
-
-    String propertyStr = getProperty(key);
-
-    try {
-      TypeParser parser = TypeParser.newBuilder().build();
-      @SuppressWarnings("unchecked")
-      T property = (T) parser.parseType(propertyStr, genericType.getType());
-      return property;
-    } catch (TypeParserException | NoSuchRegisteredParserException e) {
-      throw new IllegalArgumentException("Unable to cast value \'" + propertyStr + "\' to " + genericType, e);
-    }
-  }
-
-  private String getProperty(String key) {
-    try {
-
-      Object property = configurationSource.getConfiguration(environment).get(key);
-
-      if (property == null) {
-        throw new NoSuchElementException("No configuration with key: " + key);
-      }
-
-      return property.toString();
-
-    } catch (IllegalStateException e) {
-      throw new IllegalStateException("Couldn't fetch configuration from configuration source for key: " + key, e);
-    }
-  }
-
-  @Override
-  public <T> T bind(String prefix, Class<T> type) {
-    return bind(this, prefix, type);
-  }
-
-//  public <T> void bindKey(String prefix, Class<T> type) {
-//    bindKey(this, prefix, type);
-//  }
-
-  public <T> T extract(Class<T> type ){
-
-//    Class<?> configClass = type.getClass();
-    ConfigMeta[] annotationsByType = type.getAnnotationsByType(ConfigMeta.class);
-
-    if(annotationsByType == null || annotationsByType.length == 0){
-      throw new RuntimeException("ConfigMeta Annotation not present : Fatal Error");
-    }
-
-    ConfigMeta configMeta = annotationsByType[0];
-
-    String configKey = configMeta.configKey();
-    String bindedFileName = configMeta.bindedFileName();
-
-    final Map<String, Properties> configuration = configurationSource.getConfiguration(environment);
-    Object obj = configuration.get(bindedFileName).get(configKey);
-
-//    Object obj = configurationSource.getConfiguration(environment).get(prefix);
-    Gson gson = new Gson();
-    String jsonObj = gson.toJson(obj);
-    return gson.fromJson(jsonObj, type);
-
-  }
-
-  /**
-   * Create an instance of a given {@code type} that will be bound to the {@code configurationProvider}. Each time configuration changes the
-   * bound object will be updated with the new values. Use {@code prefix} to specify the relative path to configuration
-   * values. Please note that each method of returned object can throw runtime exceptions. For details see javadoc for
-   * {@link BindInvocationHandler#invoke(Object, Method, Object[])}.
-   *
-   * @param <T>    interface describing configuration object to bind
-   * @param prefix relative path to configuration values (e.g. "myContext" will map settings "myContext.someSetting",
-   *               "myContext.someOtherSetting")
-   * @param type   {@link Class} for {@code <T>}
-   * @return configuration object bound to this {@link ConfigurationProvider}
-   * @throws NoSuchElementException   when the provided {@code key} doesn't have a corresponding config value
-   * @throws IllegalArgumentException when property can't be coverted to {@code type}
-   * @throws IllegalStateException    when provider is unable to fetch configuration value for the given {@code key}
-   */
-  <T> T bind(ConfigurationProvider configurationProvider, String prefix, Class<T> type) {
-    @SuppressWarnings("unchecked")
-    T proxy = (T) Proxy.newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, new BindInvocationHandler(configurationProvider, prefix));
-
-    new BindingValidator().validate(proxy, type);
-
-    return proxy;
-  }
-
-//  <T> void bindKey(ConfigurationProvider configurationProvider, String prefix, Class<T> type) {
-//    @SuppressWarnings("unchecked")
-//    T proxy = (T) Proxy
-//      .newProxyInstance(type.getClassLoader(), new Class<?>[]{type}, new BindInvocationHandler(configurationProvider, prefix));
-//
-//    new BindingValidator().validate(proxy, type);
-//
-//    this.proxyMap.put(prefix, type);
-//
-//  }
 
   @Override
   public String toString() {
     return "SimpleConfigurationProvider{" +
-        "configurationSource=" + configurationSource +
-        ", environment=" + environment +
-        '}';
+      "configurationSource=" + configurationDataWrapper +
+      ", environment=" + environment +
+      '}';
   }
+
 }

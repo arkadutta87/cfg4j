@@ -63,7 +63,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
   }
 
   @Override
-  public Map<String, Properties> getConfiguration(Environment environment) {
+  public ConfigurationState getConfiguration(Environment environment) {
     LOG.trace("Requesting configuration for environment: " + environment.getName());
 
     if (!initialized) {
@@ -91,7 +91,7 @@ public class ConsulConfigurationSource implements ConfigurationSource {
     }
     propertiesMap.put(path, properties);
 
-    return propertiesMap;
+    return new ConfigurationState(propertiesMap, true);
   }
 
   /**
