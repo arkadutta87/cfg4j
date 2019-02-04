@@ -171,12 +171,12 @@ class GitConfigurationSource implements ConfigurationSource, Closeable {
       try (InputStream input = new FileInputStream(path.toFile())) {
 
         PropertiesProvider provider = propertiesProviderSelector.getProvider(path.getFileName().toString());
-//        properties.putAll(provider.getProperties(input));
         Properties fileSpecificProperties = provider.getProperties(input);
         properties.put(path.getFileName().toString(), fileSpecificProperties);
 
       } catch (IOException e) {
-        throw new IllegalStateException("Unable to load configuration from " + path.toString() + " file", e);
+//        throw new IllegalStateException("Unable to load configuration from " + path.toString() + " file", e);
+        LOG.error("Unable to load configuration from " + path.toString() + " file", e);
       }
     }
 
